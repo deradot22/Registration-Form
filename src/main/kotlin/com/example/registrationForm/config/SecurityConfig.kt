@@ -2,6 +2,7 @@ package com.example.registrationForm.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.annotation.Order
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -12,15 +13,18 @@ import org.springframework.security.web.SecurityFilterChain
 @EnableWebSecurity
 class SecurityConfig {
     @Bean
-    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        http
-            .csrf { csrf -> csrf.disable() }
-            .authorizeHttpRequests { authorize ->
-                authorize
-                    .requestMatchers("/api/register").permitAll()
-                    .anyRequest().authenticated()
+    @Order(1)
+    fun formSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
+        return http
+            .csrf {
+                it.disable()
             }
-        return http.build()
+            .securityMatcher("/api/**")
+            .authorizeHttpRequests { requests ->
+                requests
+                    .anyRequest().permitAll()
+            }
+            .build()
     }
 
     @Bean
