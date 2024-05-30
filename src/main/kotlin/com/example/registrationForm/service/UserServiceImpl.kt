@@ -6,11 +6,9 @@ import com.example.registrationForm.model.jpa.User
 import com.example.registrationForm.repo.UserRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.*
 
 @Service
 class UserServiceImpl(
@@ -22,7 +20,8 @@ class UserServiceImpl(
     init {
         Files.createDirectories(uploadDir)
     }
-    override fun registerUser(userDto: UserDto, avatar: MultipartFile?): User {
+
+    override fun registerUser(userDto: UserDto): User {
         val user = userDto.toEntity()
         if (userRepository.findByUsername(user.username) != null) {
             throw IllegalArgumentException("Username is already taken")
@@ -32,17 +31,6 @@ class UserServiceImpl(
         }
 
         val hashedPassword = passwordEncoder.encode(user.password)
-
-        var avatarUrl: String? = null
-        if (avatar != null && !avatar.isEmpty) {
-            val avatarFilename = UUID.randomUUID().toString() + "_" + avatar.originalFilename
-            val avatarPath = uploadDir.resolve(avatarFilename)
-            Files.copy(avatar.inputStream, avatarPath)
-            avatarUrl = avatarPath.toString()
-        }
-
-        val userToSave = user.copy(password = hashedPassword, avatarUrl = avatarUrl)
-
-        return userRepository.save(userToSave)
+        return userRepository.save(user.copy(password = hashedPassword))
     }
 }

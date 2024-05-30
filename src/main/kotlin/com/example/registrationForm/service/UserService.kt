@@ -5,5 +5,5 @@ import com.example.registrationForm.model.jpa.User
 import org.springframework.web.multipart.MultipartFile
 
 interface UserService {
-    fun registerUser(userDto: UserDto, avatar: MultipartFile?): User
+    fun registerUser(userDto: UserDto): User
 }
