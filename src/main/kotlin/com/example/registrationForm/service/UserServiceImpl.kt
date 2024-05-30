@@ -1,5 +1,6 @@
 package com.example.registrationForm.service
 
+import com.example.registrationForm.exception.UserAlreadyExistsException
 import com.example.registrationForm.mapper.toEntity
 import com.example.registrationForm.model.dto.UserDto
 import com.example.registrationForm.model.jpa.User
@@ -24,10 +25,10 @@ class UserServiceImpl(
     override fun registerUser(userDto: UserDto): User {
         val user = userDto.toEntity()
         if (userRepository.findByUsername(user.username) != null) {
-            throw IllegalArgumentException("Username is already taken")
+            throw UserAlreadyExistsException("Username is already taken")
         }
         if (userRepository.findByEmail(user.email) != null) {
-            throw IllegalArgumentException("Email is already taken")
+            throw UserAlreadyExistsException("Email is already taken")
         }
 
         val hashedPassword = passwordEncoder.encode(user.password)
